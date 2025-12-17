@@ -5,22 +5,20 @@ import '../cubit/auth/auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitialState());
 
-  // SIGNUP: Save email & password
+
   void signup(String email, String password) async {
     emit(AuthLoadingState());
     await Future.delayed(const Duration(seconds: 1));
 
     final prefs = await SharedPreferences.getInstance();
 
-    // Save email & password in SharedPreferences
     await prefs.setString('savedEmail', email);
     await prefs.setString('savedPassword', password);
-    await prefs.setBool('isLoggedIn', true); // Auto-login after signup
+    await prefs.setBool('isLoggedIn', true); 
 
     emit(AuthSuccessState());
   }
 
-  // LOGIN: Check credentials against saved email & password
   void login(String email, String password) async {
     emit(AuthLoadingState());
     await Future.delayed(const Duration(seconds: 1));
@@ -37,14 +35,14 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  // LOGOUT
+
   void logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false); // Keep credentials, just logout
+    await prefs.setBool('isLoggedIn', false); 
     emit(AuthInitialState());
   }
 
-  // AUTO-LOGIN CHECK
+
   Future<void> checkLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;

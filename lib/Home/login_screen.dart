@@ -21,13 +21,12 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // Email validation regex
+ 
   bool isValidEmail(String email) {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     return emailRegex.hasMatch(email);
   }
 
-  // Password validation regex: uppercase, lowercase, number, special char
   bool isValidPassword(String password) {
     final passwordRegex = RegExp(
         r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{1,}$');
