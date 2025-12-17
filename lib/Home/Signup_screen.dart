@@ -22,6 +22,18 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
+  // Email validation regex
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
+
+  // Password validation regex: uppercase, lowercase, number, special char, min 1 char
+  bool isValidPassword(String password) {
+    final passwordRegex = RegExp(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{1,}$');
+    return passwordRegex.hasMatch(password);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,25 +41,33 @@ class _SignupScreenState extends State<SignupScreen> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccessState) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => HomeScreen()),
+             ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Signup Succesfull')),
             );
-          } 
+            // Navigator.pushReplacementNamed(context, '/home');
+          }
+          if (state is AuthFailureState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.error)),
+            );
+          }
         },
         builder: (context, state) {
           if (state is AuthLoadingState) {
             return const Center(child: CircularProgressIndicator());
           }
+
           return Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextField(
                   controller: emailController,
                   decoration: const InputDecoration(labelText: "Email"),
+                  keyboardType: TextInputType.emailAddress,
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: passwordController,
                   decoration: const InputDecoration(labelText: "Password"),
@@ -56,12 +76,45 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    context.read<AuthCubit>().signup(
-                          emailController.text,
-                          passwordController.text,
-                        );
+                    final email = emailController.text.trim();
+                    final password = passwordController.text.trim();
+
+                    if (email.isEmpty || password.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Email and Password cannot be empty"),
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (!isValidEmail(email)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Enter a valid email address"),
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (!isValidPassword(password)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Password must include uppercase, lowercase, number, and special character"),
+                        ),
+                      );
+                      return;
+                    }
+
+                    context.read<AuthCubit>().signup(email, password);
                   },
                   child: const Text("Signup"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                  child: const Text("Already have an account? Login"),
                 ),
               ],
             ),

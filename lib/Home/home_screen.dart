@@ -1,11 +1,34 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../cubit/auth_cubit.dart';
 import 'login_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String userEmail = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserEmail();
+  }
+
+  // Load saved email from SharedPreferences
+  Future<void> _loadUserEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('savedEmail') ?? '';
+    setState(() {
+      userEmail = email;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,22 +40,31 @@ class HomeScreen extends StatelessWidget {
             icon: const Icon(Icons.logout),
             onPressed: () {
               context.read<AuthCubit>().logout();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-              );
+              Navigator.pushReplacementNamed(context, '/login');
             },
           ),
         ],
       ),
-      body: GridView.count(
-        crossAxisCount: 4,
-        padding: const EdgeInsets.all(5),
-        children: const [
-          _HomeTile(icon: Icons.home, label: "Home"),
-          _HomeTile(icon: Icons.notifications, label: "Notification"),
-          _HomeTile(icon: Icons.person, label: "Profile"),
-          _HomeTile(icon: Icons.settings, label: "Setting"),
+      body: Column(
+        children: [
+          const SizedBox(height: 20),
+          Text(
+            'Welcome, $userEmail',
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 4,
+              padding: const EdgeInsets.all(5),
+              children: const [
+                _HomeTile(icon: Icons.home, label: "Home"),
+                _HomeTile(icon: Icons.notifications, label: "Notification"),
+                _HomeTile(icon: Icons.person, label: "Profile"),
+                _HomeTile(icon: Icons.settings, label: "Setting"),
+              ],
+            ),
+          ),
         ],
       ),
     );

@@ -1,11 +1,20 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'cubit/auth_cubit.dart';
+import 'package:classico/cubit/auth/auth_state.dart';
 import 'Home/login_screen.dart';
+import 'Home/home_screen.dart';
+import 'Home/Signup_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(
+    BlocProvider(
+      create: (_) => AuthCubit()..checkLoginStatus(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -13,12 +22,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => AuthCubit(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Classico App',
-        home: LoginScreen(),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      routes: {
+        '/home': (_) => const HomeScreen(),
+        '/login': (_) => const LoginScreen(),
+        '/signup': (_) => const SignupScreen(),
+      },
+      home: BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, state) {
+          if (state is AuthSuccessState) {
+            return const HomeScreen();
+          }
+          return const LoginScreen();
+        },
       ),
     );
   }
