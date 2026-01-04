@@ -1,17 +1,27 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'cubit/auth_cubit.dart';
-import 'package:classico/cubit/auth/auth_state.dart';
-import 'Home/login_screen.dart';
+import 'cubit/auth/auth_state.dart';
+import 'cubit/product_cubit.dart';
+import 'services/api_service.dart';
 import 'Home/home_screen.dart';
-import 'Home/Signup_screen.dart';
+import 'Home/login_screen.dart';
+import 'Home/signup_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final apiService = ApiService();
+
   runApp(
-    BlocProvider(
-      create: (_) => AuthCubit()..checkLoginStatus(),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => AuthCubit()..checkLoginStatus()),
+        BlocProvider(create: (_) => ProductCubit(apiService)),
+      ],
       child: const MyApp(),
     ),
   );
@@ -28,6 +38,7 @@ class MyApp extends StatelessWidget {
         '/home': (_) => const HomeScreen(),
         '/login': (_) => const LoginScreen(),
         '/signup': (_) => const SignupScreen(),
+       
       },
       home: BlocBuilder<AuthCubit, AuthState>(
         builder: (context, state) {

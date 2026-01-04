@@ -65,7 +65,7 @@
 //  for(int i=0;i<=10;i++){
 //    print("hello world");
 //  }
-//  int no=10;
+//  int no=10; 
 
 //  while(no<=50){
 //    {

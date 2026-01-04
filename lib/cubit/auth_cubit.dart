@@ -28,7 +28,7 @@ class AuthCubit extends Cubit<AuthState> {
     final savedPassword = prefs.getString('savedPassword');
 
     if (email == savedEmail && password == savedPassword) {
-      await prefs.setBool('isLoggedIn', true); // set login flag
+      await prefs.setBool('isLoggedIn', true); 
       emit(AuthSuccessState());
     } else {
       emit(AuthFailureState('Invalid Email or Password'));
